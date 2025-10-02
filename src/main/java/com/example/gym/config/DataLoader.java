@@ -2,10 +2,14 @@ package com.example.gym.config;
 
 import com.example.gym.entity.Subscription;
 import com.example.gym.entity.Video;
+import com.example.gym.entity.User;  // ← ДОДАДЕНО
+import com.example.gym.entity.Role;  // ← ДОДАДЕНО
 import com.example.gym.repository.SubscriptionRepository;
 import com.example.gym.repository.VideoRepository;
+import com.example.gym.repository.UserRepository;  // ← ДОДАДЕНО
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;  // ← ДОДАДЕНО
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
@@ -18,12 +22,17 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private VideoRepository videoRepository;
 
+    @Autowired
+    private UserRepository userRepository;  // ← ДОДАДЕНО
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;  // ← ДОДАДЕНО
+
     @Override
     public void run(String... args) throws Exception {
         // Провери дали веќе има податоци
         if (subscriptionRepository.count() == 0) {
             // Додај ги претплатите
-
             Subscription basic = new Subscription();
             basic.setName("Basic");
             basic.setPrice(BigDecimal.valueOf(9.99));
@@ -84,6 +93,17 @@ public class DataLoader implements CommandLineRunner {
             videoRepository.save(video3);
 
             System.out.println("✅ Видеата се додадени!");
+        }
+
+        // Додај го ADMIN корисникот (надвор од video проверката)
+        if (userRepository.count() == 0) {
+            User adminUser = new User();
+            adminUser.setEmail("admin@gym.com");
+            adminUser.setPassword(passwordEncoder.encode("admin123"));
+            adminUser.setRole(Role.ADMIN);
+            userRepository.save(adminUser);
+
+            System.out.println("✅ Admin корисник креиран: admin@gym.com / admin123");
         }
 
         System.out.println("✅ Сите тестни податоци се подготвени!");

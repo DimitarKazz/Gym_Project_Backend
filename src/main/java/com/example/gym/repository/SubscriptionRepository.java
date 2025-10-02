@@ -7,5 +7,5 @@ import java.util.Optional;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
-    Optional<Subscription> findByName(String name);
+    Optional<Subscription> findByName(String name);  // ← ДОДАДЕНО
 }
