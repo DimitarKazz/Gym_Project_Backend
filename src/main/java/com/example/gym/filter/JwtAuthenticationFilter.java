@@ -29,14 +29,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String requestURI = request.getRequestURI();
+        System.out.println("Filtering URI: " + requestURI);
 
-        // ✅ ДОЗВОЛИ PUBLIC ENDPOINTS БЕЗ JWT ПРОВЕРКА
+        // Public endpoints
         if (isPublicEndpoint(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         final String authorizationHeader = request.getHeader("Authorization");
+        System.out.println("Authorization header: " + authorizationHeader);
 
         String email = null;
         String jwt = null;
@@ -49,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
 
-            if (jwtUtil.validateToken(jwt)) {
+            if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -60,10 +62,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // ✅ МЕТОД ЗА ОПРЕДЕЛУВАЊЕ НА PUBLIC ENDPOINTS
     private boolean isPublicEndpoint(String requestURI) {
-        return requestURI.startsWith("/api/auth/") ||
-                requestURI.equals("/api/videos") ||
+        return requestURI.startsWith("/api/auth/") ||   // login/register
+                requestURI.startsWith("/api/videos") ||
                 requestURI.startsWith("/api/days") ||
                 requestURI.startsWith("/h2-console/");
     }

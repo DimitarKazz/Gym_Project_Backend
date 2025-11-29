@@ -208,4 +208,22 @@ public class VideoController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping("/{id}/thumbnail")
+    public ResponseEntity<byte[]> getVideoThumbnail(@PathVariable Long id) {
+        try {
+            // За сега враќа placeholder, подоцна може да генерираш thumbnail
+            // или да чуваш посебна thumbnail слика
+            System.out.println("🖼️ Thumbnail requested for video ID: " + id);
+
+            // Placeholder - можеш да вратиш реална слика подоцна
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(new byte[0]); // Празно за сега
+
+        } catch (Exception e) {
+            System.err.println("❌ Error getting thumbnail: " + e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
